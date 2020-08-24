@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.board.dao.BoardDAO">
+
+	<select id="getBoardList" resultType="java.util.Map">
+		SELECT 
+			board.board_seq AS boardSeq
+			,	board.board_title AS boardTitle
+			,	board.member_seq AS memberSeq
+			,	board.board_content AS boardContent
+			,	board.use_yn	AS useYn
+			,	board.views AS views
+			,	board.create_date AS createDate
+			,	board.update_date AS updateDate
+            ,	mem.member_name AS memberName
+		FROM tb_board board
+		LEFT OUTER JOIN tb_member mem ON board.member_seq =  mem.member_seq
+		WHERE 1=1
+		<if test="searchKeyword != null and searchKeyword != ''">
+	        <choose>
+	            <when test="searchCondition == 'searchBoardTitle'">
+					AND	board.board_title LIKE CONCAT ('%',#{searchKeyword},'%')
+				</when>
+				<when test="searchCondition == 'searchBoardContent'">
+					AND	board.board_content LIKE CONCAT('%',#{searchKeyword},'%')
+				</when>
+				<when test="searchCondition == 'searchWriten'">
+					AND	mem.member_name LIKE CONCAT('%',#{searchKeyword},'%')
+				</when>
+			</choose>
+		</if>
+		ORDER BY board.create_date DESC, board.board_seq DESC
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+	
+	<select id="getBoardListCnt" resultType="int">
+		SELECT 
+			COUNT(*)
+		FROM tb_board board
+		LEFT OUTER JOIN tb_member mem ON board.member_seq =  mem.member_seq
+		WHERE 1=1
+		<if test="searchKeyword != null and searchKeyword != ''">
+	        <choose>
+	            <when test="searchCondition == 'searchBoardTitle'">
+					AND	board.board_title LIKE CONCAT ('%',#{searchKeyword},'%')
+				</when>
+				<when test="searchCondition == 'searchBoardContent'">
+					AND	board.board_content LIKE CONCAT('%',#{searchKeyword},'%')
+				</when>
+				<when test="searchCondition == 'searchWriten'">
+					AND	mem.member_name LIKE CONCAT('%',#{searchKeyword},'%')
+				</when>
+			</choose>
+		</if>
+	</select>
+	
+	<insert id="boardWrite">
+		<selectKey keyProperty="boardSeq" resultType="int">
+    			SELECT  LAST_INSERT_ID()
+  		</selectKey>
+			INSERT
+			INTO	tb_board
+			(	
+					board_title
+				,	member_seq
+				,	board_content
+				,	use_yn
+				,	views
+				,	create_date
+			)
+			VALUES
+			(
+					#{boardTitle}
+				,	#{memberSeq}
+				,	#{boardContent}
+				,	'Y'
+				,	0
+				,	NOW()
+			)
+	</insert>
+	
+
+	<select id="getBoardView" resultType="com.example.demo.board.response.BoardResponse">
+		SELECT 
+			board.board_seq AS boardSeq
+			,	board.board_title AS boardTitle
+			,	board.member_seq AS memberSeq
+			,	board.board_content AS boardContent
+			,	board.use_yn	AS useYn
+			,	board.views AS views
+			,	board.create_date AS createDate
+			,	board.update_date AS updateDate
+            ,	mem.member_name AS memberName
+		FROM tb_board board
+		LEFT OUTER JOIN tb_member mem ON board.member_seq =  mem.member_seq
+		WHERE board.board_seq = #{boardSeq}
+	</select>
+	
+	<update id="updateBoard">
+		UPDATE
+			tb_board
+		SET
+			board_title = #{boardTitle}
+		, 	board_content = #{boardContent}
+		WHERE
+			board_seq = #{boardSeq}
+	</update>
+	
+	<delete id="deleteBoard">
+		DELETE FROM tb_board WHERE board_seq=#{boardSeq}
+	</delete>
+	
+	<update id="increaseBoardView">
+		UPDATE
+			tb_board
+		SET 
+			views = views+1
+		WHERE
+			board_seq = #{boardSeq}
+	</update>
+	
+	<select id="getBoardCommentList" resultType="java.util.Map">
+		SELECT
+				comm.board_comm_seq	AS boardCommSeq
+			,	comm.board_seq		AS boardSeq
+			,	comm.member_seq		AS memberSeq
+			,	comm.board_comment	AS boardComment
+			,	comm.create_date	AS createDate
+			,	comm.update_date	AS updateDate
+            ,	mem.member_name		AS memberName
+		FROM
+			tb_board_comm comm
+		INNER JOIN tb_member mem ON comm.member_seq=mem.member_seq
+		WHERE
+			board_seq = #{boardSeq}
+	</select>
+	
+	<delete id="deleteBoardComment">
+		DELETE FROM tb_board_comm WHERE board_comm_seq=#{boardCommSeq}
+	</delete>
+	
+	<insert id="insertBoardComment">
+		<selectKey keyProperty="boardCommSeq" resultType="int">
+    			SELECT  LAST_INSERT_ID()
+  		</selectKey>
+			INSERT
+			INTO	tb_board_comm
+			(	
+					board_seq
+				,	member_seq
+				,	board_comment
+				,	create_date
+			)
+			VALUES
+			(
+					#{boardSeq}
+				,	#{memberSeq}
+				,	#{boardComment}
+				,	NOW()
+			)
+	</insert>
+	
+</mapper>

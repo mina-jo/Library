@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.member.dao.MemberDAO">
+
+	<select id="getMemberList" resultType="java.util.Map">
+		SELECT 
+			member_seq AS memberSeq
+			, 	member_id AS memberId
+			,	member_name AS memberName
+			,	member_passwd AS memberPasswd
+			,	admin_yn AS adminYn
+			,	use_yn AS useYn
+			,	birth_dt AS birthDt
+			,	email AS email
+			,	member_phone AS memberPhone
+			,	create_date AS createDate
+			,	update_date AS updateDate
+		FROM tb_member
+	</select>
+	
+	<select id="getMemberLisCnt" resultType="int">
+		SELECT 
+			COUNT(*)
+		FROM tb_member
+	</select>
+	
+	<select id="getMember" resultType="com.example.demo.member.response.MemberResponse">
+		SELECT 
+			member_seq AS memberSeq
+			, 	member_id AS memberId
+			,	member_name AS memberName
+			,	member_passwd AS memberPasswd
+			,	admin_yn AS adminYn
+			,	use_yn AS useYn
+			,	birth_dt AS birthDt
+			,	email AS email
+			,	member_phone AS memberPhone
+			,	create_date AS createDate
+			,	update_date AS updateDate
+		FROM tb_member
+		WHERE member_id=#{memberId}
+	</select>
+	
+	<select id="getMemberIdCheck" resultType="int">
+		SELECT 
+			COUNT(*)
+		FROM tb_member
+		WHERE member_id=#{memberId}
+	</select>
+	
+	<insert id="insertMember">
+			<selectKey keyProperty="memberSeq" resultType="int">
+    			SELECT  LAST_INSERT_ID()
+  			</selectKey>
+			INSERT
+			INTO	tb_member
+			(	
+					member_id
+				,	member_name
+				,	member_passwd
+				,	admin_yn
+				,	use_yn
+				,	birth_dt
+				,	email
+				,	member_phone
+				,	create_date
+			)
+			VALUES
+			(
+					#{memberId}
+				,	#{memberName}
+				,	#{memberPasswd}
+				,	'N'
+				,	'Y'
+				,	#{birthDt}
+				,	#{email}
+				,	#{memberPhone}
+				,	NOW()
+			)
+	</insert>
+
+</mapper>

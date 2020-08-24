@@ -1,0 +1,40 @@
+plugins {
+	id 'org.springframework.boot' version '2.1.6.RELEASE'
+	id 'java'
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-web-services'
+	
+	compile("javax.servlet:jstl") // jsp, jstl 사용 위
+	compile("org.apache.tomcat.embed:tomcat-embed-jasper") // jsp, jstl 사용 위함
+	compile("org.webjars:jquery:2.2.1") //jquery 사용
+	compile("org.webjars:jquery-ui:1.11.4") // jquery-ui 사용
+	compile("org.webjars:bootstrap:3.3.6") // bootstrap 사용
+	
+	// 롬복
+	compile("org.projectlombok:lombok:1.18.2")
+	
+	// hibernate
+	compile 'org.hibernate:hibernate-core:5.2.4.Final'
+	
+	//mysql , mybatis
+	compile("org.springframework.boot:spring-boot-starter-jdbc:2.0.1.RELEASE")
+    compile("mysql:mysql-connector-java:5.1.46")
+    compile("org.mybatis.spring.boot:mybatis-spring-boot-starter:1.3.1")
+    compile("org.mybatis:mybatis-spring:1.3.1")
+    compile("org.mybatis:mybatis:3.4.5")
+    
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
